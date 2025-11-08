@@ -24,10 +24,10 @@ export default function HeroSection() {
         gutterBottom
         sx={{ fontWeight: 700, textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}
       >
-        精選好物，限時優惠！
+        衣想世界｜從日常到幻想的造型自由場
       </Typography>
       <Typography variant="h6" sx={{ textShadow: '0 1px 6px rgba(0,0,0,0.6)' }}>
-        NullaShop 展示用網站 🛒
+        NullaShop 網站大量使用 AI 素材，僅供展示使用
       </Typography>
     </Box>
   );
