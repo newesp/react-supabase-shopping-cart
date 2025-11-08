@@ -98,6 +98,7 @@ app.delete('/api/admin/users/:id', async (req, res) => {
 });
 
 // ✅ 啟動 server
-app.listen(3001, () => {
-  console.log('✅ Node.js 後端已啟動：http://localhost:3001');
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
