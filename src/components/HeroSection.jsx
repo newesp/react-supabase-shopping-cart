@@ -27,7 +27,7 @@ export default function HeroSection() {
         衣想世界｜從日常到幻想的造型自由場
       </Typography>
       <Typography variant="h6" sx={{ textShadow: '0 1px 6px rgba(0,0,0,0.6)' }}>
-        NullaShop 網站大量使用 AI 素材，僅供展示使用
+        NullaShop 網站使用 AI 素材，僅供展示使用
       </Typography>
     </Box>
   );
