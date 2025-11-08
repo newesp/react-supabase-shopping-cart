@@ -82,6 +82,7 @@ export default function Users() {
     u.raw_user_meta_data?.full_name ||
     '-';
 
+  const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:3001';
 
   // --- API Functions (呼叫 /api/admin/users) ---
 
@@ -91,7 +92,7 @@ export default function Users() {
       setError(null);
       
       // 呼叫由 server/routes/adminUsers.js 提供的 GET /
-      const res = await fetch('http://localhost:3001/api/admin/users');
+      const res = await fetch(`${API_BASE}/api/admin/users`);
       const body = await res.json().catch(() => ({}));
 
       if (!res.ok) {
@@ -110,7 +111,7 @@ export default function Users() {
   const handleDelete = async (id) => {
     try {
       // 呼叫由 server/routes/adminUsers.js 提供的 DELETE /:id
-      const res = await fetch(`http://localhost:3001/api/admin/users/${id}`, {
+      const res = await fetch(`${API_BASE}/api/admin/users/${id}`, {
           method: 'DELETE',
       });
       

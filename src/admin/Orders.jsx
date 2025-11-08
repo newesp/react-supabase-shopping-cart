@@ -14,7 +14,7 @@ import {
 import { supabase } from '../supabase/client';
 
 const ORDER_STATUSES = ['已成立', '發貨中', '完成', '取消'];
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3001';
+const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:3001';
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
