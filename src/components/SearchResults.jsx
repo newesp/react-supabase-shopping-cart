@@ -10,12 +10,12 @@ export default function SearchResults() {
   const [searchParams] = useSearchParams();
   const { user, signOut } = useAuth();
   const { totalCount } = useCart();
-  const query = searchParams.get('q') || '';
+  const query = searchParams.get('term') || '';
 
   const handleSearch = (newQuery) => {
     // Update URL with new search query
     const newSearchParams = new URLSearchParams();
-    if (newQuery) newSearchParams.set('q', newQuery);
+    if (newQuery) newSearchParams.set('term', newQuery);
     window.history.pushState({}, '', `?${newSearchParams.toString()}`);
     window.location.reload(); // Refresh to show new results
   };

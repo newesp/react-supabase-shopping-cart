@@ -32,24 +32,34 @@ export default function CartDropdown({ onClose }) {
   };
 
   const handleConfirm = async () => {
-    const orderPayload = {
-      user_id: user?.id || null,
-      items,
-      total: totalAmount,
-      created_at: new Date().toISOString(),
-    };
+  const orderPayload = {
+    user_id: user?.id || null,
+    items,
+    total: totalAmount,
+    created_at: new Date().toISOString(),
+  };
 
-    const { error } = await supabase.from('orders').insert(orderPayload);
+  const { error } = await supabase.from('orders').insert(orderPayload);
     if (error) {
       console.error('❌ 訂單儲存失敗:', error.message);
     } else {
       console.log('✅ 訂單已儲存');
-      clearCart(); // 清空購物車
-    }
 
-    setConfirmOpen(false);
-    onClose(); // 關閉購物車
-    navigate('/order-success');
+      // 儲存訂單摘要
+      const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+      clearCart(); // 清空購物車
+      setConfirmOpen(false);
+      onClose(); // 關閉購物車
+
+      // ✅ 傳入訂單摘要給 OrderSuccess
+      navigate('/order-success', {
+        state: {
+          totalAmount,
+          totalCount,
+        },
+      });
+    }
   };
 
   return (

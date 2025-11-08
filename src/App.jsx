@@ -53,7 +53,7 @@ const MainContent = () => {
 
   const handleSearch = (term) => {
     if (term.trim()) {
-      navigate(`/search?q=${encodeURIComponent(term.trim())}`);
+      navigate(`/search?term=${encodeURIComponent(term.trim())}`);
     }
   };
 

@@ -1,16 +1,42 @@
 import { Box, Typography, Button } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
-import { useCart } from '../context/CartContext';
+import useNavbarProps from '../hooks/useNavbarProps';
+import { useAuth } from '../context/AuthContext';
 
 export default function OrderSuccess() {
   const navigate = useNavigate();
-  const { totalAmount, totalCount } = useCart(); // 若已清空購物車，可改從 URL 或 localStorage 傳入
+  const location = useLocation();  
+  const {
+      isLoggedIn,
+      user,
+      cartCount,
+      onLoginClick,
+      onLogoutClick,
+      onSearch,
+      searchTerm,
+      setSearchTerm,
+    } = useNavbarProps();
+
+  // 從 location.state 傳入訂單資訊
+  const { totalAmount, totalCount } = location.state || {
+    totalAmount: 0,
+    totalCount: 0,
+  };
 
   return (
     <Box>
-      <Navbar />
+      <Navbar
+        isLoggedIn={isLoggedIn}
+        user={user}
+        cartCount={cartCount}
+        onLoginClick={onLoginClick}
+        onLogoutClick={onLogoutClick}
+        onSearch={onSearch}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+      />
 
       <Box sx={{ p: 4, textAlign: 'center' }}>
         <CheckCircleIcon sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
