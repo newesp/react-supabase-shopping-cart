@@ -1,13 +1,15 @@
 // /server/index.js
 const express = require('express');
 const app = express();
-const dotenv = require('dotenv');
 const cors = require('cors');
 const getUserInfoRoute = require('./routes/getUserInfo');
 const { createClient } = require('@supabase/supabase-js');
 
 // ✅ 載入根目錄 .env
-dotenv.config();
+const dotenv = require('dotenv');
+dotenv.config({ path: '../.env' });
+console.log('✅ SUPABASE_URL:', process.env.SUPABASE_URL);
+
 
 // ✅ 檢查環境變數是否存在
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {

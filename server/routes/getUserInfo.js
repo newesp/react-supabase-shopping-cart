@@ -4,7 +4,8 @@ const router = express.Router();
 const { createClient } = require('@supabase/supabase-js');
 
 // ✅ 載入根目錄 .env
-require('dotenv').config();
+const dotenv = require('dotenv');
+dotenv.config({ path: '../.env' });
 
 // ✅ 初始化 Supabase admin client
 const supabase = createClient(
