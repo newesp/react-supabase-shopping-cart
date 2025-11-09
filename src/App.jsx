@@ -17,6 +17,7 @@ import OrderSuccess from './components/OrderSuccess';
 import MyOrders from './pages/MyOrders.jsx';
 import ProductDetail from './pages/ProductDetail.jsx';
 import AdminLogin from './admin/Login.jsx';
+import Footer from './components/Footer';
 import { Box } from '@mui/material';
 import 'keen-slider/keen-slider.min.css';
 import 'yet-another-react-lightbox/styles.css';
@@ -85,11 +86,18 @@ const AppLayout = () => {
   const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
-    <>
-      <Outlet />
-      {/* 已移除購物車按鈕與 Popover，統一由 Navbar 控管 */}
-      {!isAdminRoute && <Box sx={{ height: 0 }} />}
-    </>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+      }}
+    >
+      <Box sx={{ flexGrow: 1 }}>
+        <Outlet />
+      </Box>
+      {!isAdminRoute && <Footer />}
+    </Box>
   );
 };
 
