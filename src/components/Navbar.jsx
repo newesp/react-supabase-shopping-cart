@@ -58,7 +58,6 @@ const Navbar = ({ user, cartCount, onSearch, onLoginClick, onLogoutClick }) => {
           <Button
             onClick={() => navigate('/')}
             sx={{ color: 'white', textTransform: 'none', fontSize: '1.25rem', mr: 2 }}
-            startIcon={<ShoppingCartIcon />}
           >
             NullaShop
           </Button>
@@ -147,7 +146,7 @@ const Navbar = ({ user, cartCount, onSearch, onLoginClick, onLogoutClick }) => {
           <Box
             sx={{
               position: 'fixed',
-              top: { xs: 72, sm: 72 },
+              top: { xs: 10, sm: 10 },
               right: 16,
               zIndex: (theme) => theme.zIndex.tooltip,
             }}

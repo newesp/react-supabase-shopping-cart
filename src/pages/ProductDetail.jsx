@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import useNavbarProps from '../hooks/useNavbarProps';
 import Navbar from '../components/Navbar';
+import AuthDialog from '../components/AuthDialog';
 import { useCart } from '../context/CartContext';
 import { useKeenSlider } from 'keen-slider/react';
 import Lightbox from 'yet-another-react-lightbox';
@@ -23,12 +24,15 @@ export default function ProductDetail() {
     isLoggedIn,
     user,
     cartCount,
-    onLoginClick,
     onLogoutClick,
     onSearch,
     searchTerm,
     setSearchTerm,
   } = useNavbarProps();
+
+  const [authOpen, setAuthOpen] = useState(false);
+  const handleLoginClick = () => setAuthOpen(true);
+  const handleAuthClose = () => setAuthOpen(false);
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
@@ -95,7 +99,7 @@ export default function ProductDetail() {
         isLoggedIn={isLoggedIn}
         user={user}
         cartCount={cartCount}
-        onLoginClick={onLoginClick}
+        onLoginClick={handleLoginClick}
         onLogoutClick={onLogoutClick}
         onSearch={onSearch}
         searchTerm={searchTerm}
@@ -190,6 +194,9 @@ export default function ProductDetail() {
           </Grid>
         </Grid>
       </Box>
+
+      {/* 登入對話框 */}
+      <AuthDialog open={authOpen} onClose={handleAuthClose} />
 
       {/* 圖片放大預覽 */}
       {lightboxOpen && (
