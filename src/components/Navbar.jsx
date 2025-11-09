@@ -54,15 +54,34 @@ const Navbar = ({ user, cartCount, onSearch, onLoginClick, onLogoutClick }) => {
   return (
     <>
       <AppBar position="static">
-        <Toolbar sx={{ justifyContent: 'space-between', flexWrap: 'wrap', pr: { xs: '100px', sm: '160px' } }}>
-          <Button
-            onClick={() => navigate('/')}
-            sx={{ color: 'white', textTransform: 'none', fontSize: '1.25rem', mr: 2 }}
-          >
-            NullaShop
-          </Button>
+        <Toolbar
+          sx={{
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: { xs: 'stretch', sm: 'center' },
+            justifyContent: 'space-between',
+            gap: { xs: 1.5, sm: 0 },
+            px: 2,
+            py: { xs: 1.5, sm: 1 },
+          }}
+        >
+          {/* 品牌按鈕 */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+            <Button
+              onClick={() => navigate('/')}
+              sx={{
+                color: 'white',
+                textTransform: 'none',
+                fontSize: { xs: '1.1rem', sm: '1.25rem' },
+                fontWeight: 500,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              NullaShop
+            </Button>
+          </Box>
 
-          <Box sx={{ flexGrow: 1, maxWidth: 400 }}>
+          {/* 搜尋欄位 */}
+          <Box sx={{ width: '100%', maxWidth: 480 }}>
             <TextField
               fullWidth
               size="small"
@@ -91,10 +110,28 @@ const Navbar = ({ user, cartCount, onSearch, onLoginClick, onLogoutClick }) => {
             />
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {/* 使用者區塊 */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              flexWrap: 'wrap',
+              justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+              width: '100%',
+              mt: { xs: 1, sm: 0 },
+            }}
+          >
             {isLoggedIn ? (
               <>
-                <Typography variant="body1" sx={{ color: 'white' }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'white',
+                    fontSize: { xs: '0.9rem', sm: '1rem' },
+                    whiteSpace: 'nowrap',
+                  }}
+                >
                   歡迎，{displayName}
                 </Typography>
 
@@ -141,12 +178,13 @@ const Navbar = ({ user, cartCount, onSearch, onLoginClick, onLogoutClick }) => {
         </Toolbar>
       </AppBar>
 
+      {/* 購物車浮動按鈕 */}
       {!isAdminRoute && (
         <>
           <Box
             sx={{
               position: 'fixed',
-              top: { xs: 10, sm: 10 },
+              bottom: 16,
               right: 16,
               zIndex: (theme) => theme.zIndex.tooltip,
             }}
