@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   List,
@@ -20,44 +20,52 @@ import { useCart } from '../context/CartContext';
 import { supabase } from '../supabase/client';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export default function CartDropdown({ onClose }) {
   const { items, removeFromCart, updateQuantity, totalAmount, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, setShowLoginModal } = useAuth();
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingCheckout, setPendingCheckout] = useState(false); // ✅ 登入後續接結帳
   const navigate = useNavigate();
 
   const handleCheckout = () => {
+    if (!user) {
+      toast.warning('請先登入');
+      setPendingCheckout(true); // ✅ 標記為待結帳
+      setShowLoginModal(true);
+      return;
+    }
     setConfirmOpen(true);
   };
 
-  const handleConfirm = async () => {
-  const orderPayload = {
-    user_id: user?.id || null,
-    items,
-    total: totalAmount,
-    created_at: new Date().toISOString(),
-  };
+  // ✅ 登入後自動開啟確認結帳視窗
+  useEffect(() => {
+    if (user && pendingCheckout) {
+      setConfirmOpen(true);
+      setPendingCheckout(false);
+    }
+  }, [user, pendingCheckout]);
 
-  const { error } = await supabase.from('orders').insert(orderPayload);
+  const handleConfirm = async () => {
+    const orderPayload = {
+      user_id: user?.id || null,
+      items,
+      total: totalAmount,
+      created_at: new Date().toISOString(),
+    };
+
+    const { error } = await supabase.from('orders').insert(orderPayload);
     if (error) {
       console.error('❌ 訂單儲存失敗:', error.message);
     } else {
       console.log('✅ 訂單已儲存');
-
-      // 儲存訂單摘要
       const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
-
-      clearCart(); // 清空購物車
+      clearCart();
       setConfirmOpen(false);
-      onClose(); // 關閉購物車
-
-      // ✅ 傳入訂單摘要給 OrderSuccess
+      onClose();
       navigate('/order-success', {
-        state: {
-          totalAmount,
-          totalCount,
-        },
+        state: { totalAmount, totalCount },
       });
     }
   };
@@ -121,7 +129,6 @@ export default function CartDropdown({ onClose }) {
         )}
       </Box>
 
-      {/* 彈出確認視窗 */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle>確認結帳</DialogTitle>
         <DialogContent>

@@ -1,4 +1,4 @@
-import React, { useState, Suspense, lazy } from 'react';
+import React, { Suspense, lazy } from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -19,14 +19,14 @@ import ProductDetail from './pages/ProductDetail.jsx';
 import AdminLogin from './admin/Login.jsx';
 import Footer from './components/Footer';
 import { Box } from '@mui/material';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import 'keen-slider/keen-slider.min.css';
 import 'yet-another-react-lightbox/styles.css';
 
-// Lazy-loaded components
 const AdminRoute = lazy(() => import('./admin/AdminRoute.jsx'));
 const SearchResults = lazy(() => import('./components/SearchResults.jsx'));
 
-// Error Boundary
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -47,9 +47,8 @@ class ErrorBoundary extends React.Component {
 }
 
 const MainContent = () => {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, signOut, showLoginModal, setShowLoginModal } = useAuth(); // ✅ 改用 setShowLoginModal
   const { totalCount } = useCart();
-  const [authOpen, setAuthOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleSearch = (term) => {
@@ -58,8 +57,7 @@ const MainContent = () => {
     }
   };
 
-  const handleLoginClick = () => setAuthOpen(true);
-  const handleAuthClose = () => setAuthOpen(false);
+  const handleLoginClick = () => setShowLoginModal(true); // ✅ 可手動開啟登入視窗
   const handleLogoutClick = async () => await signOut();
 
   if (loading) return <p>載入中...</p>;
@@ -76,7 +74,7 @@ const MainContent = () => {
       />
       <HeroSection />
       <ProductGrid />
-      <AuthDialog open={authOpen} onClose={handleAuthClose} />
+      <AuthDialog open={showLoginModal} onClose={() => setShowLoginModal(false)} /> {/* ✅ 統一關閉方式 */}
     </>
   );
 };
@@ -86,13 +84,7 @@ const AppLayout = () => {
   const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '100vh',
-      }}
-    >
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Box sx={{ flexGrow: 1 }}>
         <Outlet />
       </Box>
@@ -106,9 +98,9 @@ const App = () => (
     <AuthProvider>
       <CartProvider>
         <BrowserRouter>
+          <ToastContainer />
           <Suspense fallback={<p>頁面載入中...</p>}>
             <Routes>
-              {/* 前台 routes 包在 AppLayout */}
               <Route element={<AppLayout />}>
                 <Route path="/" element={<MainContent />} />
                 <Route path="/search" element={<SearchResults />} />
@@ -116,8 +108,6 @@ const App = () => (
                 <Route path="/orders" element={<MyOrders />} />
                 <Route path="/products/:id" element={<ProductDetail />} />
               </Route>
-
-              {/* 後台 routes 不包 AppLayout */}
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/*" element={<AdminRoute />} />
             </Routes>

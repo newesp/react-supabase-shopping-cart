@@ -3,27 +3,25 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import useNavbarProps from '../hooks/useNavbarProps';
-import { useAuth } from '../context/AuthContext';
 
 export default function OrderSuccess() {
   const navigate = useNavigate();
-  const location = useLocation();  
+  const location = useLocation();
   const {
-      isLoggedIn,
-      user,
-      cartCount,
-      onLoginClick,
-      onLogoutClick,
-      onSearch,
-      searchTerm,
-      setSearchTerm,
-    } = useNavbarProps();
+    isLoggedIn,
+    user,
+    cartCount,
+    onLoginClick,
+    onLogoutClick,
+    onSearch,
+    searchTerm,
+    setSearchTerm,
+  } = useNavbarProps();
 
   // 從 location.state 傳入訂單資訊
-  const { totalAmount, totalCount } = location.state || {
-    totalAmount: 0,
-    totalCount: 0,
-  };
+  const { totalAmount, totalCount } = location.state || {};
+
+  const hasOrderData = typeof totalAmount === 'number' && typeof totalCount === 'number';
 
   return (
     <Box>
@@ -47,10 +45,16 @@ export default function OrderSuccess() {
           感謝您的購買，我們已成功建立您的訂單。
         </Typography>
 
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle1">商品數量：{totalCount} 件</Typography>
-          <Typography variant="subtitle1">總金額：NT$ {totalAmount.toLocaleString()}</Typography>
-        </Box>
+        {hasOrderData ? (
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle1">商品數量：{totalCount} 件</Typography>
+            <Typography variant="subtitle1">總金額：NT$ {totalAmount.toLocaleString()}</Typography>
+          </Box>
+        ) : (
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            無法取得訂單資料，請確認是否從結帳流程導向本頁。
+          </Typography>
+        )}
 
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
           <Button variant="outlined" onClick={() => navigate('/orders')}>

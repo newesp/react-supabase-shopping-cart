@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const CartContext = createContext();
 
@@ -11,16 +11,29 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(() => {
+    try {
+      const stored = localStorage.getItem('cart');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // ✅ 每次購物車變動時同步到 localStorage
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(items));
+  }, [items]);
 
   const clearCart = () => {
     setItems([]);
   };
+
   const addToCart = (product) => {
-    setItems(prev => {
-      const existing = prev.find(item => item.id === product.id);
+    setItems((prev) => {
+      const existing = prev.find((item) => item.id === product.id);
       if (existing) {
-        return prev.map(item =>
+        return prev.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
@@ -31,16 +44,18 @@ export const CartProvider = ({ children }) => {
   };
 
   const removeFromCart = (productId) => {
-    setItems(prev => prev.filter(item => item.id !== productId));
+    setItems((prev) => prev.filter((item) => item.id !== productId));
   };
 
   const updateQuantity = (productId, quantity) => {
-    setItems(prev =>
-      prev.map(item =>
-        item.id === productId
-          ? { ...item, quantity: Math.max(0, quantity) }
-          : item
-      ).filter(item => item.quantity > 0)
+    setItems((prev) =>
+      prev
+        .map((item) =>
+          item.id === productId
+            ? { ...item, quantity: Math.max(0, quantity) }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
     );
   };
 
@@ -54,7 +69,7 @@ export const CartProvider = ({ children }) => {
     updateQuantity,
     clearCart,
     totalCount,
-    totalAmount
+    totalAmount,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

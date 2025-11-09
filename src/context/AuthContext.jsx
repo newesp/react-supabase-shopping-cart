@@ -14,15 +14,14 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showLoginModal, setShowLoginModal] = useState(false); // ✅ 控制登入視窗
 
   useEffect(() => {
-    // 初始 session 檢查
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // 監聽登入狀態變化
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
@@ -71,6 +70,8 @@ export const AuthProvider = ({ children }) => {
     signUp,
     signOut,
     signInWithGoogle,
+    showLoginModal,
+    setShowLoginModal, // ✅ 統一使用 setter 控制登入視窗
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

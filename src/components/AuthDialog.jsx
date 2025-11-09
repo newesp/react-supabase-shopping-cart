@@ -15,7 +15,7 @@ import {
 import GoogleIcon from '@mui/icons-material/Google';
 import { useAuth } from '../hooks/useAuth';
 
-export default function AuthDialog({ open, onClose }) {
+export default function AuthDialog({ open, onClose, onLoginSuccess }) {
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
@@ -65,7 +65,8 @@ export default function AuthDialog({ open, onClose }) {
         setName('');
       } else {
         await signIn(email, password);
-        onClose();
+        onClose(); // ✅ 關閉視窗
+        if (onLoginSuccess) onLoginSuccess(); // ✅ 通知外部元件
       }
     } catch (err) {
       setErrorMsg(err.message);
@@ -80,7 +81,8 @@ export default function AuthDialog({ open, onClose }) {
     setLoading(true);
     try {
       await signInWithGoogle();
-      onClose();
+      onClose(); // ✅ 關閉視窗
+      if (onLoginSuccess) onLoginSuccess(); // ✅ 通知外部元件
     } catch (err) {
       setErrorMsg(err.message);
     } finally {
