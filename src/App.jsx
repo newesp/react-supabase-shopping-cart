@@ -20,6 +20,9 @@ import ProductDetail from './pages/ProductDetail.jsx';
 import AdminLogin from './admin/Login.jsx';
 import { Box, IconButton, Badge, Popover } from '@mui/material';
 import { FaShoppingCart } from 'react-icons/fa';
+import 'keen-slider/keen-slider.min.css';
+import 'yet-another-react-lightbox/styles.css';
+
 
 // Lazy-loaded components
 const AdminRoute = lazy(() => import('./admin/AdminRoute.jsx'));

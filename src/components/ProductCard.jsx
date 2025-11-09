@@ -1,88 +1,173 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Card,
-  CardMedia,
   CardContent,
   Typography,
   CardActions,
   Button,
-  Box,
-  Chip,
   IconButton,
+  Box,
 } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import InfoIcon from '@mui/icons-material/Info';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { useKeenSlider } from 'keen-slider/react';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 
 export default function ProductCard({ product }) {
-  const { addToCart } = useCart(); // ✅ 修正為 addToCart
+  const { addToCart } = useCart();
   const navigate = useNavigate();
 
-  const cover =
-    Array.isArray(product.image_urls) && product.image_urls.length > 0
-      ? product.image_urls[0]
-      : '/placeholder.png';
+  const images = Array.isArray(product.image_urls) && product.image_urls.length > 0
+    ? product.image_urls
+    : ['/placeholder.png'];
   const price = product.price ?? 0;
 
-  // ✅ 導向詳情頁
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const [sliderRef, slider] = useKeenSlider({
+    loop: true,
+    mode: 'snap',
+    slides: { perView: 1 },
+    spacing: 8,
+    slideChanged: (s) => setCurrentSlide(s.track.details.rel),
+  });
+
   const handleNavigate = () => {
     console.log('導向商品 ID:', product.id);
     navigate(`/products/${product.id}`);
   };
 
-  // ✅ 加入購物車
   const handleAddToCart = (e) => {
-    e.stopPropagation(); // 防止觸發導向
+    e.stopPropagation();
     addToCart({
       id: product.id,
       name: product.name,
       price: price,
-      image: cover,
+      image: images[0],
     });
   };
 
-  // ✅ 點擊 InfoIcon 導向詳情
   const handleInfoClick = (e) => {
     e.stopPropagation();
     handleNavigate();
   };
 
   return (
-    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* 商品圖片與 Featured 標籤 */}
-      <Box sx={{ position: 'relative' }}>
-        <CardMedia
-          component="img"
-          height="180"
-          image={cover}
-          alt={product.name}
-          sx={{ objectFit: 'cover' }}
-        />        
+    <Card
+      sx={{
+        width: 300,
+        height: 520,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        borderRadius: 3,
+        boxShadow: 4,
+        overflow: 'hidden',
+      }}
+    >
+      {/* 商品圖片輪播區 */}
+      <Box sx={{ width: '100%', pt: 1 }}>
+        <Box
+          ref={sliderRef}
+          className="keen-slider"
+          sx={{
+            width: '100%',
+            height: 280,
+            overflow: 'hidden',
+            borderRadius: 2,
+            boxShadow: 2,
+            cursor: 'pointer',
+          }}
+        >
+          {images.map((url, index) => (
+            <Box
+              key={index}
+              className="keen-slider__slide"
+              sx={{
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#f9f9f9',
+              }}
+              onClick={() => {
+                setPhotoIndex(index);
+                setLightboxOpen(true);
+              }}
+            >
+              <img
+                src={url}
+                alt={`product-${index}`}
+                style={{
+                  maxHeight: '100%',
+                  maxWidth: '100%',
+                  objectFit: 'cover',
+                  borderRadius: 8,
+                }}
+              />
+            </Box>
+          ))}
+        </Box>
+
+        {/* 點點導覽 */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+          {images.map((_, idx) => (
+            <Box
+              key={idx}
+              onClick={() => slider.current?.moveToIdx(idx)}
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                backgroundColor: currentSlide === idx ? '#1976d2' : '#ccc',
+                mx: 0.5,
+                cursor: 'pointer',
+                transition: 'background-color 0.3s',
+              }}
+            />
+          ))}
+        </Box>
       </Box>
 
-      {/* 商品資訊區塊（可點擊導向詳情頁） */}
+      {/* 商品資訊區塊 */}
       <CardContent
-        sx={{ flexGrow: 1, cursor: 'pointer' }}
+        sx={{
+          flexGrow: 1,
+          cursor: 'pointer',
+          px: 2,
+          py: 1,
+        }}
         onClick={handleNavigate}
       >
-        <Typography variant="subtitle1" noWrap component="div">
+        <Typography variant="subtitle1" noWrap>
           {product.name}
         </Typography>
         <Typography
           variant="body2"
           color="text.secondary"
-          sx={{ mt: 1, minHeight: 40 }}
-          component="div"
+          sx={{
+            mt: 0.5,
+            minHeight: 40,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+          }}
         >
           {product.description}
         </Typography>
-        <Typography variant="h6" sx={{ mt: 1 }} component="div">
+        <Typography variant="h6" sx={{ mt: 1 }}>
           NT$ {price.toLocaleString()}
         </Typography>
       </CardContent>
 
-      {/* 操作區塊：加入購物車與詳情導向 */}
+      {/* 操作區塊 */}
       <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
         <Button
           size="small"
@@ -99,6 +184,16 @@ export default function ProductCard({ product }) {
           <InfoIcon />
         </IconButton>
       </CardActions>
+
+      {/* 圖片放大預覽 */}
+      {lightboxOpen && (
+        <Lightbox
+          open={lightboxOpen}
+          close={() => setLightboxOpen(false)}
+          index={photoIndex}
+          slides={images.map((url) => ({ src: url }))}
+        />
+      )}
     </Card>
   );
 }

@@ -6,13 +6,13 @@ import {
   Typography,
   CircularProgress,
   Grid,
-  Card,
-  CardMedia,
   Button,
 } from '@mui/material';
 import useNavbarProps from '../hooks/useNavbarProps';
 import Navbar from '../components/Navbar';
 import { useCart } from '../context/CartContext';
+import { useKeenSlider } from 'keen-slider/react';
+import Lightbox from 'yet-another-react-lightbox';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -30,9 +30,24 @@ export default function ProductDetail() {
     setSearchTerm,
   } = useNavbarProps();
 
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const getImages = (urls) =>
+    Array.isArray(urls) && urls.length > 0 ? urls : ['/placeholder.jpg'];
+
+  const images = getImages(product?.image_urls);
+
+  const [sliderRef, slider] = useKeenSlider({
+    loop: true,
+    mode: 'snap',
+    slides: { perView: 1 },
+    spacing: 8,
+    slideChanged: (s) => setCurrentSlide(s.track.details.rel),
+  });
 
   useEffect(() => {
-    console.log('收到商品 ID:', id);
     fetchProduct();
   }, [id]);
 
@@ -52,9 +67,6 @@ export default function ProductDetail() {
     setLoading(false);
   };
 
-  const getImages = (urls) =>
-    Array.isArray(urls) && urls.length > 0 ? urls : ['/placeholder.jpg'];
-
   if (loading) {
     return (
       <>
@@ -71,9 +83,7 @@ export default function ProductDetail() {
       <>
         <Navbar />
         <Box sx={{ p: 4 }}>
-          <Typography color="error" component="div">
-            找不到商品。
-          </Typography>
+          <Typography color="error">找不到商品。</Typography>
         </Box>
       </>
     );
@@ -94,43 +104,80 @@ export default function ProductDetail() {
 
       <Box sx={{ p: 4 }}>
         <Grid container spacing={4}>
-          {/* 商品圖片區塊 */}
+          {/* 商品圖片輪播區塊 */}
           <Grid item xs={12} md={6}>
-            <Grid container spacing={2}>
-              {getImages(product.image_urls).map((url, idx) => (
-                <Grid item xs={6} key={idx}>
-                  <Card>
-                    <CardMedia
-                      component="img"
-                      image={url}
+            <Box sx={{ maxWidth: 400, mx: 'auto' }}>
+              <Box
+                ref={sliderRef}
+                className="keen-slider"
+                sx={{
+                  height: 400,
+                  borderRadius: 2,
+                  overflow: 'hidden',
+                  boxShadow: 3,
+                  cursor: 'pointer',
+                }}
+              >
+                {images.map((url, idx) => (
+                  <Box
+                    key={idx}
+                    className="keen-slider__slide"
+                    sx={{
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: '#f9f9f9',
+                    }}
+                    onClick={() => {
+                      setPhotoIndex(idx);
+                      setLightboxOpen(true);
+                    }}
+                  >
+                    <img
+                      src={url}
                       alt={`商品圖片 ${idx + 1}`}
-                      sx={{ height: 240, objectFit: 'cover' }}
+                      style={{
+                        maxHeight: '100%',
+                        maxWidth: '100%',
+                        objectFit: 'cover',
+                        borderRadius: 8,
+                      }}
                     />
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
+                  </Box>
+                ))}
+              </Box>
+
+              {/* 點點導覽 */}
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                {images.map((_, idx) => (
+                  <Box
+                    key={idx}
+                    onClick={() => slider.current?.moveToIdx(idx)}
+                    sx={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: '50%',
+                      backgroundColor: currentSlide === idx ? '#1976d2' : '#ccc',
+                      mx: 0.5,
+                      cursor: 'pointer',
+                      transition: 'background-color 0.3s',
+                    }}
+                  />
+                ))}
+              </Box>
+            </Box>
           </Grid>
 
           {/* 商品資訊區塊 */}
           <Grid item xs={12} md={6}>
-            <Typography variant="h5" gutterBottom component="div">
+            <Typography variant="h4" gutterBottom>
               {product.name}
             </Typography>
-            <Typography
-              variant="body1"
-              color="text.secondary"
-              sx={{ mb: 2 }}
-              component="div"
-            >
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
               {product.description}
             </Typography>
-            <Typography
-              variant="h6"
-              color="primary"
-              sx={{ mb: 3 }}
-              component="div"
-            >
+            <Typography variant="h5" color="primary" sx={{ mb: 3 }}>
               NT$ {product.price?.toLocaleString()}
             </Typography>
             <Button
@@ -143,6 +190,16 @@ export default function ProductDetail() {
           </Grid>
         </Grid>
       </Box>
+
+      {/* 圖片放大預覽 */}
+      {lightboxOpen && (
+        <Lightbox
+          open={lightboxOpen}
+          close={() => setLightboxOpen(false)}
+          index={photoIndex}
+          slides={images.map((url) => ({ src: url }))}
+        />
+      )}
     </>
   );
 }

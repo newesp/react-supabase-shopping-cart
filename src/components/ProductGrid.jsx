@@ -48,11 +48,20 @@ export default function ProductGrid({ searchTerm }) {
 
   if (loading) {
     return (
-      <Grid container spacing={3} sx={{ p: 3 }}>
+      <Grid
+        container
+        spacing={3}
+        justifyContent="center" // ✅ Skeleton 卡片也置中
+        sx={{ p: 3 }}
+      >
         {[1, 2, 3, 4].map((n) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={n}>
-            <Card>
-              <Skeleton variant="rectangular" height={200} />
+          <Grid
+            item
+            key={n}
+            sx={{ display: 'flex', justifyContent: 'center' }}
+          >
+            <Card sx={{ width: 240, height: 360 }}>
+              <Skeleton variant="rectangular" height={180} />
               <CardContent>
                 <Skeleton variant="text" />
                 <Skeleton variant="text" width="60%" />
@@ -80,9 +89,18 @@ export default function ProductGrid({ searchTerm }) {
         </Typography>
       )}
 
-      <Grid container spacing={3} sx={{ p: 3 }}>
+      <Grid
+        container
+        spacing={3}
+        justifyContent="center" // ✅ 商品卡片置中排列
+        sx={{ p: 3 }}
+      >
         {products.map((product) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
+          <Grid
+            item
+            key={product.id}
+            sx={{ display: 'flex', justifyContent: 'center' }} // ✅ 單張卡片也置中
+          >
             <ProductCard product={product} />
           </Grid>
         ))}
